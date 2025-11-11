@@ -1,0 +1,70 @@
+package UNIBRA_2MB;
+import robocode.*;
+import static robocode.util.Utils.normalRelativeAngleDegrees;
+import java.awt.Color;
+
+
+public class RoboDefesa extends Robot{
+
+	public void run() {
+		
+		setBodyColor(Color.orange);
+		setGunColor(Color.orange);
+		setBulletColor(Color.red);
+		
+		while(true) {
+			
+			turnGunRight(180);
+			if (Math.random() > 0.5){
+				turnRight(45);
+			} else {
+				turnLeft(45);
+			}
+			ahead(100);
+		}
+	}
+	
+
+	public void onScannedRobot(ScannedRobotEvent e) {
+		double absoluteBearing = getHeading() + e.getBearing();
+		double bearingFromGun = normalRelativeAngleDegrees(absoluteBearing - getGunHeading());
+		
+		if (Math.abs(bearingFromGun) < 5 && getGunHeat() == 0){
+			if (e.getDistance() < 200){
+				fire(2);
+			} else if (e.getDistance() < 400){
+				fire(1.5);
+			} else {
+				fire(1);		
+			}
+		}
+		
+	}
+
+	
+	public void alignGunWithBody(){
+		double turn = normalRelativeAngleDegrees(getHeading() - getGunHeading());
+		turnGunRight(turn);
+	}	
+
+	public void onHitByBullet(HitByBulletEvent e) {
+		
+		turnLeft(90);
+		back(40);
+	}
+	
+
+	public void onHitWall(HitWallEvent e) {
+		double margin = 20;
+		double larguraCampo = getBattleFieldWidth();
+		double alturaCampo = getBattleFieldHeight();
+		double x = getX();
+		double y = getY();
+		
+		if (x <= margin || x >= larguraCampo - margin || y >= alturaCampo - margin){
+			turnRight(90);
+			ahead(100);	
+		}
+	}
+		
+}
